@@ -28,14 +28,12 @@ pub fn part_one(input: &str) -> Option<i64> {
 pub fn part_two(input: &str) -> Option<i64> {
     let (_, input) = parse(input).unwrap();
 
-    let left: Vec<_> = input.iter().map(|(l, _)| l).collect();
-    let right: Vec<_> = input.iter().map(|(_, r)| r).collect();
-
+    let (left, right): (Vec<_>, Vec<_>) = input.into_iter().unzip();
     let counts = right.into_iter().counts();
 
     Some(
         left.into_iter()
-            .map(|&l| l * *counts.get(&l).unwrap_or(&0) as i64)
+            .map(|l| l * *counts.get(&l).unwrap_or(&0) as i64)
             .sum(),
     )
 }
