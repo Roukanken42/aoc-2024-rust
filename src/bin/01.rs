@@ -26,7 +26,18 @@ pub fn part_one(input: &str) -> Option<i64> {
 }
 
 pub fn part_two(input: &str) -> Option<i64> {
-    None
+    let (_, input) = parse(input).ok()?;
+
+    let left: Vec<_> = input.iter().map(|(l, _)| l).collect();
+    let right: Vec<_> = input.iter().map(|(_, r)| r).collect();
+
+    let counts = right.into_iter().counts();
+
+    Some(
+        left.into_iter()
+            .map(|&l| l * *counts.get(&l).unwrap_or(&0) as i64)
+            .sum(),
+    )
 }
 
 #[cfg(test)]
@@ -52,6 +63,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(31));
     }
 }
