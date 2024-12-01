@@ -12,7 +12,7 @@ pub fn parse(input: &str) -> IResult<&str, Vec<(i64, i64)>> {
 }
 
 pub fn part_one(input: &str) -> Option<i64> {
-    let (_, input) = parse(input).ok()?;
+    let (_, input) = parse(input).unwrap();
 
     let left: Vec<_> = input.iter().map(|(l, _)| l).sorted().collect();
     let right: Vec<_> = input.iter().map(|(_, r)| r).sorted().collect();
@@ -26,7 +26,7 @@ pub fn part_one(input: &str) -> Option<i64> {
 }
 
 pub fn part_two(input: &str) -> Option<i64> {
-    let (_, input) = parse(input).ok()?;
+    let (_, input) = parse(input).unwrap();
 
     let left: Vec<_> = input.iter().map(|(l, _)| l).collect();
     let right: Vec<_> = input.iter().map(|(_, r)| r).collect();
