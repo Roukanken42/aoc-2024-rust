@@ -21,7 +21,7 @@ pub fn part_one(input: &str) -> Option<i64> {
         left.into_iter()
             .zip(right.into_iter())
             .map(|(&l, &r)| (l - r).abs())
-            .sum::<i64>(),
+            .sum(),
     )
 }
 
