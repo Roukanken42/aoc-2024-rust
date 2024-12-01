@@ -8,7 +8,7 @@ use nom::multi::separated_list1;
 use nom::sequence::{pair, terminated};
 use nom::{IResult, Parser};
 
-pub fn parse_input_by_lines<'a, O, E, F>(f: F) -> impl FnMut(&'a str) -> IResult<&str, Vec<O>, E>
+pub fn parse_input_by_lines<'a, O, E, F>(f: F) -> impl FnMut(&'a str) -> IResult<&'a str, Vec<O>, E>
 where
     F: Parser<&'a str, O, E>,
     E: ParseError<&'a str>,
@@ -16,7 +16,7 @@ where
     parse_input(separated_list1(line_ending, f))
 }
 
-pub fn parse_input<'a, O, E, F>(f: F) -> impl FnMut(&'a str) -> IResult<&str, O, E>
+pub fn parse_input<'a, O, E, F>(f: F) -> impl FnMut(&'a str) -> IResult<&'a str, O, E>
 where
     F: Parser<&'a str, O, E>,
     E: ParseError<&'a str>,
