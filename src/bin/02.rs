@@ -19,24 +19,62 @@ pub fn part_one(input: &str) -> Option<usize> {
     let positive_gradual_diffs = HashSet::from([1, 2, 3]);
     let negative_gradual_diffs = HashSet::from([-1, -2, -3]);
 
-    let valid_reports = reports.into_iter().filter(|report| {
+    let valid_reports = reports
+        .into_iter()
+        .filter(|report| {
+            let diffs = report
+                .iter()
+                .zip(report.iter().skip(1))
+                .map(|(a, b)| b - a)
+                .counts()
+                .keys()
+                .copied()
+                .collect::<HashSet<_>>();
+
+            diffs.is_subset(&positive_gradual_diffs) || diffs.is_subset(&negative_gradual_diffs)
+        })
+        .count();
+
+    Some(valid_reports)
+}
+
+pub fn part_two(input: &str) -> Option<usize> {
+    let (_, reports) = parse(input).unwrap();
+
+    let positive_gradual_diffs = HashSet::from([1, 2, 3]);
+    let negative_gradual_diffs = HashSet::from([-1, -2, -3]);
+
+    let is_valid_report = |report: &[i32]| -> bool {
         let diffs = report
             .iter()
             .zip(report.iter().skip(1))
-            .map(|(a, b)| a - b)
+            .map(|(a, b)| b - a)
             .counts()
             .keys()
             .copied()
             .collect::<HashSet<_>>();
 
         diffs.is_subset(&positive_gradual_diffs) || diffs.is_subset(&negative_gradual_diffs)
-    }).count();
+    };
+
+    let valid_reports = reports
+        .into_iter()
+        .filter(|report| {
+            if is_valid_report(&report) { return true; }
+
+            for i in 0..report.len() {
+                let mut report = report.clone();
+                report.remove(i);
+                if is_valid_report(&report) {
+                    return true;
+                }
+            }
+
+            return false;
+        })
+        .count();
 
     Some(valid_reports)
-}
-
-pub fn part_two(input: &str) -> Option<i32> {
-    None
 }
 
 #[cfg(test)]
@@ -72,6 +110,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(4));
     }
 }
