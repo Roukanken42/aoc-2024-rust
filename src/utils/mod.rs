@@ -24,6 +24,11 @@ where
     all_consuming(terminated(f, opt(line_ending)))
 }
 
+pub fn end_of_file(input: &str) -> IResult<&str, ()> {
+    let (input, _) = all_consuming(opt(line_ending))(input)?;
+    Ok((input, ()))
+}
+
 pub trait Parsable<'a> {
     fn parse(input: &'a str) -> IResult<&'a str, Self>
     where
