@@ -42,6 +42,7 @@ fn parse(input: &str) -> IResult<&str, Vec<Instruction>> {
 
 pub fn part_one(input: &str) -> Option<u32> {
     let (_, input) = parse(input).unwrap();
+
     Some(
         input
             .iter()
@@ -60,21 +61,16 @@ pub fn part_two(input: &str) -> Option<u32> {
     Some(
         input
             .iter()
-            .map(|instr| match instr {
-                Mul(a, b) => {
-                    if enabled {
-                        a * b
-                    } else {
-                        0
-                    }
+            .map(|instr| {
+                match instr {
+                    Do => enabled = true,
+                    Dont => enabled = false,
+                    _ => (),
                 }
-                Do => {
-                    enabled = true;
-                    0
-                }
-                Dont => {
-                    enabled = false;
-                    0
+
+                match instr {
+                    Mul(a, b) if enabled => a * b,
+                    _ => 0
                 }
             })
             .sum(),
