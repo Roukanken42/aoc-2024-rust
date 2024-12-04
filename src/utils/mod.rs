@@ -1,4 +1,4 @@
-mod location;
+pub mod location;
 
 use std::str::FromStr;
 

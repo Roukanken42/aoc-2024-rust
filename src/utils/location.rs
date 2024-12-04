@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use std::iter::successors;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
@@ -7,6 +8,12 @@ use num::{one, zero, Bounded, Num, Signed, Zero};
 pub struct Location<T: Num> {
     pub x: T,
     pub y: T,
+}
+
+impl<T: Display + Num> Display for Location<T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
 }
 
 impl<T: Num> Location<T> {
@@ -166,7 +173,7 @@ impl<T: Num + Copy + Signed> Neg for Location<T> {
 pub trait Access2d<T> {
     fn get_2d(&self, loc: Location<i32>) -> Option<&T>;
     fn set_2d(&mut self, loc: Location<i32>, element: T) -> Option<()>;
-    fn iter_2d_keys(&self) -> SquareIterator<usize>;
+    fn iter_2d_keys(&self) -> SquareIterator<i32>;
 }
 
 impl<T> Access2d<T> for Vec<Vec<T>> {
@@ -184,8 +191,8 @@ impl<T> Access2d<T> for Vec<Vec<T>> {
             .map(|_| ())
     }
 
-    fn iter_2d_keys(&self) -> SquareIterator<usize> {
-        Location::new(0, 0).iter_range(Location::new(self[0].len(), self.len()))
+    fn iter_2d_keys(&self) -> SquareIterator<i32> {
+        Location::new(0, 0).iter_range(Location::new(self[0].len() as i32, self.len() as i32))
     }
 }
 
