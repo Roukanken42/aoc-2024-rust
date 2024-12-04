@@ -1,3 +1,5 @@
+mod location;
+
 use std::str::FromStr;
 
 use nom::bytes::complete::is_a;
