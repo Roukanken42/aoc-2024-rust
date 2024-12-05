@@ -6,7 +6,9 @@ use nom::combinator::map;
 use nom::multi::{many1, separated_list1};
 use nom::sequence::separated_pair;
 use nom::IResult;
-use std::collections::{HashMap, HashSet};
+use std::cmp::Ordering;
+use std::cmp::Ordering::{Equal, Greater, Less};
+use std::collections::HashMap;
 
 advent_of_code::solution!(5);
 
@@ -42,98 +44,52 @@ impl Parsable<'_> for Input {
     }
 }
 
-fn construct_greater_than_tree(rules: &[Rule]) -> HashMap<u32, Vec<u32>> {
+fn construct_comparison_tree(rules: &[Rule]) -> HashMap<(u32, u32), Ordering> {
     let mut tree = HashMap::new();
 
     for rule in rules {
-        tree.entry(rule.greater)
-            .or_insert_with(Vec::new)
-            .push(rule.lesser);
+        tree.insert((rule.lesser, rule.greater), Less);
+        tree.insert((rule.greater, rule.lesser), Greater);
     }
 
     tree
 }
 
-fn determine_values(
-    greater_than_tree: &HashMap<u32, Vec<u32>>,
-    keys: &HashSet<u32>,
-) -> HashMap<u32, u32> {
-    let mut values = HashMap::new();
-
-    fn determine_value(
-        key: u32,
-        greater_than_tree: &HashMap<u32, Vec<u32>>,
-        values: &mut HashMap<u32, u32>,
-        keys: &HashSet<u32>,
-    ) -> u32 {
-        if let Some(&val) = values.get(&key) {
-            return val;
-        }
-
-        let binding = vec![];
-        let lesser_keys = greater_than_tree.get(&key).unwrap_or(&binding);
-        let value = lesser_keys
-            .iter()
-            .filter(|&k| keys.contains(k))
-            .map(|&k| determine_value(k, greater_than_tree, values, keys))
-            .max()
-            .unwrap_or(0)
-            + 1;
-
-        values.insert(key, value);
-
-        value
-    }
-
-    for &key in greater_than_tree.keys() {
-        determine_value(key, &greater_than_tree, &mut values, &keys);
-    }
-
-    values
-}
-
 pub fn part_one(input: &str) -> Option<u32> {
     let (_, input) = Input::parse(input).unwrap();
 
-    let greater_than_tree = construct_greater_than_tree(&input.rules);
+    let comparison_tree = construct_comparison_tree(&input.rules);
 
     Some(
         input
             .updates
             .into_iter()
             .filter(|update| {
-                let values =
-                    determine_values(&greater_than_tree, &update.iter().copied().collect());
-                update.is_sorted_by_key(|&key| values.get(&key).unwrap_or(&0))
+                update
+                    .is_sorted_by(|&lhs, &rhs| comparison_tree.get(&(lhs, rhs)) == Some(&Ordering::Less))
             })
             .map(|update| update[update.len() / 2])
             .sum(),
     )
 }
-
 pub fn part_two(input: &str) -> Option<u32> {
     let (_, input) = Input::parse(input).unwrap();
 
-    let greater_than_tree = construct_greater_than_tree(&input.rules);
+    let comparison_tree = construct_comparison_tree(&input.rules);
 
     Some(
         input
             .updates
             .into_iter()
-            .filter_map(|update| {
-                let values =
-                    determine_values(&greater_than_tree, &update.iter().copied().collect());
-
-                if update.is_sorted_by_key(|&key| values.get(&key).unwrap_or(&0)) {
-                    return None;
-                } else {
-                    Some(
-                        update
-                            .into_iter()
-                            .sorted_by_key(|&key| values.get(&key).unwrap_or(&0))
-                            .collect::<Vec<_>>(),
-                    )
-                }
+            .filter(|update| {
+                !update
+                    .is_sorted_by(|&lhs, &rhs| comparison_tree.get(&(lhs, rhs)) == Some(&Ordering::Less))
+            })
+            .map(|update| {
+                update
+                    .into_iter()
+                    .sorted_by(|&lhs, &rhs| *comparison_tree.get(&(lhs, rhs)).unwrap_or(&Equal))
+                    .collect::<Vec<_>>()
             })
             .map(|update| update[update.len() / 2])
             .sum(),
@@ -168,31 +124,6 @@ mod tests {
         );
 
         assert_eq!(input.updates[0], vec![75, 47, 61, 53, 29]);
-    }
-
-    #[test]
-    fn test_construct_greater_than_tree() {
-        let input = advent_of_code::template::read_file("examples", DAY);
-        let (_, input) = Input::parse(&input).unwrap();
-
-        let result = construct_greater_than_tree(&input.rules);
-
-        assert_eq!(result.get(&13), Some(&vec![97, 61, 29, 47, 75, 53]));
-        assert_eq!(result.get(&61), Some(&vec![97, 47, 75]));
-    }
-
-    #[test]
-    fn test_determine_values() {
-        let input = advent_of_code::template::read_file("examples", DAY);
-        let (_, input) = Input::parse(&input).unwrap();
-
-        let greater_than_tree = construct_greater_than_tree(&input.rules);
-        let result = determine_values(&greater_than_tree, &HashSet::from([75, 47, 61, 53, 29]));
-
-        assert_eq!(
-            result,
-            HashMap::from([(61, 3), (53, 4), (13, 6), (29, 5), (47, 2), (75, 1)])
-        );
     }
 
     #[test]
