@@ -1,10 +1,11 @@
+use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::iter::successors;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 use num::{one, zero, Bounded, Num, Signed, Zero};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Location<T: Num> {
     pub x: T,
     pub y: T,
@@ -193,6 +194,20 @@ impl<T> Access2d<T> for Vec<Vec<T>> {
 
     fn iter_2d_keys(&self) -> SquareIterator<i32> {
         Location::new(0, 0).iter_range(Location::new(self[0].len() as i32, self.len() as i32))
+    }
+}
+
+impl<T: Num + PartialOrd> PartialOrd for Location<T> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        if (self.x < other.x) && (self.y < other.y) {
+            Some(Ordering::Less)
+        } else if (self.x > other.x) || (self.y > other.y) {
+            Some(Ordering::Greater)
+        } else if self.x == other.x && self.y == other.y {
+            Some(Ordering::Equal)
+        } else {
+            None
+        }
     }
 }
 
