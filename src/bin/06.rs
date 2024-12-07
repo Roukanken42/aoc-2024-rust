@@ -38,14 +38,8 @@ struct Map {
 
 impl Map {
     fn new(tiles: &Vec<Vec<Tile>>) -> Self {
-        let obstacles = tiles
-            .iter_2d_keys()
-            .filter(|&loc| tiles.get_2d(loc) == Some(&Tile::Obstacle))
-            .collect();
-        let guard = tiles
-            .iter_2d_keys()
-            .find(|&loc| tiles.get_2d(loc) == Some(&Tile::Guard))
-            .unwrap();
+        let obstacles = tiles.iter_2d_keys().filter(|&loc| tiles.get_2d(loc) == Some(&Tile::Obstacle)).collect();
+        let guard = tiles.iter_2d_keys().find(|&loc| tiles.get_2d(loc) == Some(&Tile::Guard)).unwrap();
         let size = Location::new(tiles[0].len() as i32, tiles.len() as i32);
 
         Self {
@@ -91,17 +85,13 @@ fn sim_obstacle_in_front(
     let mut local_visited_states = HashSet::new();
 
     while (Location::zero()..map.size).contains(&current) {
-        if visited_states.contains(&(current, direction))
-            || local_visited_states.contains(&(current, direction))
-        {
+        if visited_states.contains(&(current, direction)) || local_visited_states.contains(&(current, direction)) {
             return true;
         }
 
         local_visited_states.insert((current, direction));
 
-        while map.obstacles.contains(&(current + direction))
-            || current + direction == extra_obstacle
-        {
+        while map.obstacles.contains(&(current + direction)) || current + direction == extra_obstacle {
             direction = direction.rotate_90_cw();
             local_visited_states.insert((current, direction));
         }
@@ -164,41 +154,11 @@ mod tests {
     #[test]
     fn test_map_new() {
         let map = Map::new(&vec![
-            vec![
-                Tile::Empty,
-                Tile::Empty,
-                Tile::Empty,
-                Tile::Empty,
-                Tile::Empty,
-            ],
-            vec![
-                Tile::Empty,
-                Tile::Empty,
-                Tile::Empty,
-                Tile::Obstacle,
-                Tile::Empty,
-            ],
-            vec![
-                Tile::Empty,
-                Tile::Empty,
-                Tile::Empty,
-                Tile::Empty,
-                Tile::Empty,
-            ],
-            vec![
-                Tile::Empty,
-                Tile::Empty,
-                Tile::Guard,
-                Tile::Empty,
-                Tile::Empty,
-            ],
-            vec![
-                Tile::Empty,
-                Tile::Empty,
-                Tile::Empty,
-                Tile::Empty,
-                Tile::Empty,
-            ],
+            vec![Tile::Empty, Tile::Empty, Tile::Empty, Tile::Empty, Tile::Empty],
+            vec![Tile::Empty, Tile::Empty, Tile::Empty, Tile::Obstacle, Tile::Empty],
+            vec![Tile::Empty, Tile::Empty, Tile::Empty, Tile::Empty, Tile::Empty],
+            vec![Tile::Empty, Tile::Empty, Tile::Guard, Tile::Empty, Tile::Empty],
+            vec![Tile::Empty, Tile::Empty, Tile::Empty, Tile::Empty, Tile::Empty],
         ]);
 
         assert_eq!(map.obstacles, HashSet::from([Location::new(3, 1)]));

@@ -64,10 +64,7 @@ pub fn part_one(input: &str) -> Option<u32> {
         input
             .updates
             .into_iter()
-            .filter(|update| {
-                update
-                    .is_sorted_by(|&lhs, &rhs| comparison_tree.get(&(lhs, rhs)) == Some(&Ordering::Less))
-            })
+            .filter(|update| update.is_sorted_by(|&lhs, &rhs| comparison_tree.get(&(lhs, rhs)) == Some(&Ordering::Less)))
             .map(|update| update[update.len() / 2])
             .sum(),
     )
@@ -81,10 +78,7 @@ pub fn part_two(input: &str) -> Option<u32> {
         input
             .updates
             .into_iter()
-            .filter(|update| {
-                !update
-                    .is_sorted_by(|&lhs, &rhs| comparison_tree.get(&(lhs, rhs)) == Some(&Ordering::Less))
-            })
+            .filter(|update| !update.is_sorted_by(|&lhs, &rhs| comparison_tree.get(&(lhs, rhs)) == Some(&Ordering::Less)))
             .map(|update| {
                 update
                     .into_iter()
@@ -108,20 +102,8 @@ mod tests {
         let (str, input) = result.unwrap();
 
         assert!(str.is_empty());
-        assert_eq!(
-            input.rules[0],
-            Rule {
-                lesser: 47,
-                greater: 53
-            }
-        );
-        assert_eq!(
-            input.rules.last(),
-            Some(&Rule {
-                lesser: 53,
-                greater: 13
-            })
-        );
+        assert_eq!(input.rules[0], Rule { lesser: 47, greater: 53 });
+        assert_eq!(input.rules.last(), Some(&Rule { lesser: 53, greater: 13 }));
 
         assert_eq!(input.updates[0], vec![75, 47, 61, 53, 29]);
     }

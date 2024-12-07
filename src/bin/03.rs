@@ -19,11 +19,7 @@ enum Instruction {
 
 impl Parsable<'_> for Instruction {
     fn parse(input: &str) -> IResult<&str, Self> {
-        let recognize_mul = delimited(
-            tag("mul("),
-            separated_pair(u32::parse, tag(","), u32::parse),
-            tag(")"),
-        );
+        let recognize_mul = delimited(tag("mul("), separated_pair(u32::parse, tag(","), u32::parse), tag(")"));
 
         alt((
             value(Do, tag("do()")),
@@ -34,10 +30,7 @@ impl Parsable<'_> for Instruction {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Instruction>> {
-    parse_input(terminated(
-        many1(map(many_till(anychar, Instruction::parse), |t| t.1)),
-        many0(anychar),
-    ))(input)
+    parse_input(terminated(many1(map(many_till(anychar, Instruction::parse), |t| t.1)), many0(anychar)))(input)
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
@@ -70,7 +63,7 @@ pub fn part_two(input: &str) -> Option<u32> {
 
                 match instr {
                     Mul(a, b) if enabled => a * b,
-                    _ => 0
+                    _ => 0,
                 }
             })
             .sum(),
@@ -85,13 +78,7 @@ mod tests {
     fn test_parse() {
         let input = advent_of_code::template::read_file("examples", DAY);
         let result = parse(&input);
-        assert_eq!(
-            result,
-            Ok((
-                "",
-                vec![Mul(2, 4), Dont, Mul(5, 5), Mul(11, 8), Do, Mul(8, 5)]
-            ))
-        );
+        assert_eq!(result, Ok(("", vec![Mul(2, 4), Dont, Mul(5, 5), Mul(11, 8), Do, Mul(8, 5)])));
     }
 
     #[test]

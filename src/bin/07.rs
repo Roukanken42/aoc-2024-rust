@@ -143,15 +143,42 @@ mod tests {
             Ok((
                 "",
                 vec![
-                    Equation { result: 190, numbers: vec![10, 19] },
-                    Equation { result: 3267, numbers: vec![81, 40, 27] },
-                    Equation { result: 83, numbers: vec![17, 5] },
-                    Equation { result: 156, numbers: vec![15, 6] },
-                    Equation { result: 7290, numbers: vec![6, 8, 6, 15] },
-                    Equation { result: 161011, numbers: vec![16, 10, 13] },
-                    Equation { result: 192, numbers: vec![17, 8, 14] },
-                    Equation { result: 21037, numbers: vec![9, 7, 18, 13] },
-                    Equation { result: 292, numbers: vec![11, 6, 16, 20] },
+                    Equation {
+                        result: 190,
+                        numbers: vec![10, 19]
+                    },
+                    Equation {
+                        result: 3267,
+                        numbers: vec![81, 40, 27]
+                    },
+                    Equation {
+                        result: 83,
+                        numbers: vec![17, 5]
+                    },
+                    Equation {
+                        result: 156,
+                        numbers: vec![15, 6]
+                    },
+                    Equation {
+                        result: 7290,
+                        numbers: vec![6, 8, 6, 15]
+                    },
+                    Equation {
+                        result: 161011,
+                        numbers: vec![16, 10, 13]
+                    },
+                    Equation {
+                        result: 192,
+                        numbers: vec![17, 8, 14]
+                    },
+                    Equation {
+                        result: 21037,
+                        numbers: vec![9, 7, 18, 13]
+                    },
+                    Equation {
+                        result: 292,
+                        numbers: vec![11, 6, 16, 20]
+                    },
                 ]
             ))
         );
@@ -159,30 +186,114 @@ mod tests {
 
     #[test]
     fn test_is_solvable() {
-        assert_eq!(Equation { result: 3267, numbers: vec![81, 40, 27] }.is_solvable(), true);
-        assert_eq!(Equation { result: 156, numbers: vec![15, 6] }.is_solvable(), false);
-        assert_eq!(Equation { result: 83, numbers: vec![17, 5] }.is_solvable(), false);
+        assert_eq!(
+            Equation {
+                result: 3267,
+                numbers: vec![81, 40, 27]
+            }
+                .is_solvable(),
+            true
+        );
+        assert_eq!(
+            Equation {
+                result: 156,
+                numbers: vec![15, 6]
+            }
+                .is_solvable(),
+            false
+        );
+        assert_eq!(
+            Equation {
+                result: 83,
+                numbers: vec![17, 5]
+            }
+                .is_solvable(),
+            false
+        );
     }
 
     #[test]
     fn test_is_solvable_backwards() {
-        assert_eq!(Equation { result: 3267, numbers: vec![81, 40, 27] }.is_solvable_backwards(), true);
-        assert_eq!(Equation { result: 156, numbers: vec![15, 6] }.is_solvable_backwards(), false);
-        assert_eq!(Equation { result: 83, numbers: vec![17, 5] }.is_solvable_backwards(), false);
+        assert_eq!(
+            Equation {
+                result: 3267,
+                numbers: vec![81, 40, 27]
+            }
+                .is_solvable_backwards(),
+            true
+        );
+        assert_eq!(
+            Equation {
+                result: 156,
+                numbers: vec![15, 6]
+            }
+                .is_solvable_backwards(),
+            false
+        );
+        assert_eq!(
+            Equation {
+                result: 83,
+                numbers: vec![17, 5]
+            }
+                .is_solvable_backwards(),
+            false
+        );
     }
 
     #[test]
     fn test_is_solvable_with_concat() {
-        assert_eq!(Equation { result: 3267, numbers: vec![81, 40, 27] }.is_solvable_with_concat(), true);
-        assert_eq!(Equation { result: 156, numbers: vec![15, 6] }.is_solvable_with_concat(), true);
-        assert_eq!(Equation { result: 83, numbers: vec![17, 5] }.is_solvable_with_concat(), false);
+        assert_eq!(
+            Equation {
+                result: 3267,
+                numbers: vec![81, 40, 27]
+            }
+                .is_solvable_with_concat(),
+            true
+        );
+        assert_eq!(
+            Equation {
+                result: 156,
+                numbers: vec![15, 6]
+            }
+                .is_solvable_with_concat(),
+            true
+        );
+        assert_eq!(
+            Equation {
+                result: 83,
+                numbers: vec![17, 5]
+            }
+                .is_solvable_with_concat(),
+            false
+        );
     }
 
     #[test]
     fn test_is_solvable_backwards_with_concat() {
-        assert_eq!(Equation { result: 3267, numbers: vec![81, 40, 27] }.is_solvable_backwards_with_concat(), true);
-        assert_eq!(Equation { result: 156, numbers: vec![15, 6] }.is_solvable_backwards_with_concat(), true);
-        assert_eq!(Equation { result: 83, numbers: vec![17, 5] }.is_solvable_backwards_with_concat(), false);
+        assert_eq!(
+            Equation {
+                result: 3267,
+                numbers: vec![81, 40, 27]
+            }
+                .is_solvable_backwards_with_concat(),
+            true
+        );
+        assert_eq!(
+            Equation {
+                result: 156,
+                numbers: vec![15, 6]
+            }
+                .is_solvable_backwards_with_concat(),
+            true
+        );
+        assert_eq!(
+            Equation {
+                result: 83,
+                numbers: vec![17, 5]
+            }
+                .is_solvable_backwards_with_concat(),
+            false
+        );
     }
 
     #[test]

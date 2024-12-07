@@ -16,16 +16,7 @@ pub fn parse(input: &str) -> IResult<&str, Vec<Vec<char>>> {
 pub fn part_one(input: &str) -> Option<usize> {
     let (_, input) = parse(input).unwrap();
 
-    let directions = vec![
-        UP,
-        UP + RIGHT,
-        RIGHT,
-        RIGHT + DOWN,
-        DOWN,
-        DOWN + LEFT,
-        LEFT,
-        LEFT + UP,
-    ];
+    let directions = vec![UP, UP + RIGHT, RIGHT, RIGHT + DOWN, DOWN, DOWN + LEFT, LEFT, LEFT + UP];
     let search_for = vec!['X', 'M', 'A', 'S'];
 
     Some(
@@ -46,24 +37,22 @@ pub fn part_one(input: &str) -> Option<usize> {
 pub fn part_two(input: &str) -> Option<u32> {
     let (_, input) = parse(input).unwrap();
 
-    let directions = vec![
-        UP + RIGHT,
-        RIGHT + DOWN,
-        DOWN + LEFT,
-        LEFT + UP,
-    ];
+    let directions = vec![UP + RIGHT, RIGHT + DOWN, DOWN + LEFT, LEFT + UP];
 
     let mut result = 0;
 
     for start in input.iter_2d_keys() {
-        if input.get_2d(start) != Some(&'A') { continue; }
+        if input.get_2d(start) != Some(&'A') {
+            continue;
+        }
 
         let neighbours = directions.iter().map(|&direction| input.get_2d(start + direction)).collect::<Vec<_>>();
         let counts = neighbours.iter().counts();
 
         let has_two_m = counts.get(&Some(&'M')).unwrap_or(&0) == &2;
         let has_two_s = counts.get(&Some(&'S')).unwrap_or(&0) == &2;
-        let is_not_a_cross = neighbours == vec![Some(&'M'), Some(&'S'), Some(&'M'), Some(&'S')] || neighbours == vec![Some(&'S'), Some(&'M'), Some(&'S'), Some(&'M')];
+        let is_not_a_cross =
+            neighbours == vec![Some(&'M'), Some(&'S'), Some(&'M'), Some(&'S')] || neighbours == vec![Some(&'S'), Some(&'M'), Some(&'S'), Some(&'M')];
 
         if has_two_s && has_two_m && !is_not_a_cross {
             result += 1;
@@ -86,10 +75,7 @@ mod tests {
         let result = result.unwrap();
 
         assert!(result.0.is_empty());
-        assert_eq!(
-            result.1[0],
-            vec!['M', 'M', 'M', 'S', 'X', 'X', 'M', 'A', 'S', 'M']
-        );
+        assert_eq!(result.1[0], vec!['M', 'M', 'M', 'S', 'X', 'X', 'M', 'A', 'S', 'M']);
     }
 
     #[test]

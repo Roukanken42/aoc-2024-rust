@@ -44,14 +44,14 @@ impl<T: Num + Copy + Signed> Location<T> {
         (self.x - other.x).abs() + (self.y - other.y).abs()
     }
 
-    pub fn iter_adjacent(self) -> impl IntoIterator<Item=Location<T>> {
+    pub fn iter_adjacent(self) -> impl IntoIterator<Item = Location<T>> {
         [
             Location::new(zero(), one::<T>()),
             Location::new(one::<T>(), zero()),
             Location::new(zero(), -one::<T>()),
             Location::new(-one::<T>(), zero()),
         ]
-            .map(move |direction| self + direction)
+        .map(move |direction| self + direction)
     }
 }
 
@@ -77,7 +77,7 @@ impl<T: Num + Copy + PartialOrd> Location<T> {
         }
     }
 
-    pub fn iter_ray(self, direction: Location<T>) -> impl Iterator<Item=Location<T>> {
+    pub fn iter_ray(self, direction: Location<T>) -> impl Iterator<Item = Location<T>> {
         successors(Some(self), move |&current| Some(current + direction))
     }
 }

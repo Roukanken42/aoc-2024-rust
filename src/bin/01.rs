@@ -17,12 +17,7 @@ pub fn part_one(input: &str) -> Option<i64> {
     let left: Vec<_> = input.iter().map(|(l, _)| l).sorted().collect();
     let right: Vec<_> = input.iter().map(|(_, r)| r).sorted().collect();
 
-    Some(
-        left.into_iter()
-            .zip(right.into_iter())
-            .map(|(&l, &r)| (l - r).abs())
-            .sum(),
-    )
+    Some(left.into_iter().zip(right.into_iter()).map(|(&l, &r)| (l - r).abs()).sum())
 }
 
 pub fn part_two(input: &str) -> Option<i64> {
@@ -31,11 +26,7 @@ pub fn part_two(input: &str) -> Option<i64> {
     let (left, right): (Vec<_>, Vec<_>) = input.into_iter().unzip();
     let counts = right.into_iter().counts();
 
-    Some(
-        left.into_iter()
-            .map(|l| l * *counts.get(&l).unwrap_or(&0) as i64)
-            .sum(),
-    )
+    Some(left.into_iter().map(|l| l * *counts.get(&l).unwrap_or(&0) as i64).sum())
 }
 
 #[cfg(test)]
@@ -46,10 +37,7 @@ mod tests {
     fn test_parse() {
         let input = advent_of_code::template::read_file("examples", DAY);
         let result = parse(&input);
-        assert_eq!(
-            result,
-            Ok(("", vec![(3, 4), (4, 3), (2, 5), (1, 3), (3, 9), (3, 3)]))
-        );
+        assert_eq!(result, Ok(("", vec![(3, 4), (4, 3), (2, 5), (1, 3), (3, 9), (3, 3)])));
     }
 
     #[test]
