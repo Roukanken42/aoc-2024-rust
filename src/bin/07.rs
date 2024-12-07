@@ -22,6 +22,7 @@ impl Parsable<'_> for Equation {
 }
 
 impl Equation {
+    #[allow(dead_code)]
     fn is_solvable(&self) -> bool {
         let mut possible_values = HashSet::from([self.numbers[0]]);
 
@@ -37,6 +38,27 @@ impl Equation {
         possible_values.contains(&self.result)
     }
 
+    fn is_solvable_backwards(&self) -> bool {
+        let mut possible_values = HashSet::from([self.result]);
+
+        for number in self.numbers.iter().rev() {
+            let mut new_possible_values = HashSet::new();
+
+            for value in &possible_values {
+                if value >= number {
+                    new_possible_values.insert(value - number);
+                }
+                if value % number == 0 {
+                    new_possible_values.insert(value / number);
+                }
+            }
+            possible_values = new_possible_values;
+        }
+
+        possible_values.contains(&0)
+    }
+
+    #[allow(dead_code)]
     fn is_solvable_with_concat(&self) -> bool {
         let mut possible_values = HashSet::from([self.numbers[0]]);
 
@@ -52,6 +74,31 @@ impl Equation {
 
         possible_values.contains(&self.result)
     }
+
+    fn is_solvable_backwards_with_concat(&self) -> bool {
+        let mut possible_values = HashSet::from([self.result]);
+
+        for number in self.numbers.iter().rev() {
+            let mut new_possible_values = HashSet::new();
+
+            for value in &possible_values {
+                if value >= number {
+                    new_possible_values.insert(value - number);
+                }
+                if value % number == 0 {
+                    new_possible_values.insert(value / number);
+                }
+
+                let concat = 10u64.pow(number.ilog10() + 1);
+                if *value % concat == *number {
+                    new_possible_values.insert(*value / concat);
+                }
+            }
+            possible_values = new_possible_values;
+        }
+
+        possible_values.contains(&0)
+    }
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Equation>> {
@@ -64,7 +111,7 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(
         equations
             .into_iter()
-            .filter(|equation| equation.is_solvable())
+            .filter(|equation| equation.is_solvable_backwards())
             .map(|equation| equation.result)
             .sum(),
     )
@@ -76,7 +123,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     Some(
         equations
             .into_iter()
-            .filter(|equation| equation.is_solvable_with_concat())
+            .filter(|equation| equation.is_solvable_backwards_with_concat())
             .map(|equation| equation.result)
             .sum(),
     )
@@ -114,6 +161,28 @@ mod tests {
     fn test_is_solvable() {
         assert_eq!(Equation { result: 3267, numbers: vec![81, 40, 27] }.is_solvable(), true);
         assert_eq!(Equation { result: 156, numbers: vec![15, 6] }.is_solvable(), false);
+        assert_eq!(Equation { result: 83, numbers: vec![17, 5] }.is_solvable(), false);
+    }
+
+    #[test]
+    fn test_is_solvable_backwards() {
+        assert_eq!(Equation { result: 3267, numbers: vec![81, 40, 27] }.is_solvable_backwards(), true);
+        assert_eq!(Equation { result: 156, numbers: vec![15, 6] }.is_solvable_backwards(), false);
+        assert_eq!(Equation { result: 83, numbers: vec![17, 5] }.is_solvable_backwards(), false);
+    }
+
+    #[test]
+    fn test_is_solvable_with_concat() {
+        assert_eq!(Equation { result: 3267, numbers: vec![81, 40, 27] }.is_solvable_with_concat(), true);
+        assert_eq!(Equation { result: 156, numbers: vec![15, 6] }.is_solvable_with_concat(), true);
+        assert_eq!(Equation { result: 83, numbers: vec![17, 5] }.is_solvable_with_concat(), false);
+    }
+
+    #[test]
+    fn test_is_solvable_backwards_with_concat() {
+        assert_eq!(Equation { result: 3267, numbers: vec![81, 40, 27] }.is_solvable_backwards_with_concat(), true);
+        assert_eq!(Equation { result: 156, numbers: vec![15, 6] }.is_solvable_backwards_with_concat(), true);
+        assert_eq!(Equation { result: 83, numbers: vec![17, 5] }.is_solvable_backwards_with_concat(), false);
     }
 
     #[test]
