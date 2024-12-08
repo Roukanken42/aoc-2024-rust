@@ -49,7 +49,7 @@ pub fn part_one(input: &str) -> Option<usize> {
                 [a + diff, b - diff]
             })
         })
-        .filter(|loc| (Location::zero()..=(map.size - Location::new(1, 1))).contains(loc))
+        .filter(|loc| Location::zero().square_range(map.size).contains(loc))
         .unique()
         .count();
 
@@ -68,11 +68,8 @@ pub fn part_two(input: &str) -> Option<usize> {
                 let diff = a - b;
 
                 a.iter_ray(diff)
-                    .take_while(|loc| (Location::zero()..=(map.size - Location::new(1, 1))).contains(loc))
-                    .chain(
-                        b.iter_ray(-diff)
-                            .take_while(|loc| (Location::zero()..=(map.size - Location::new(1, 1))).contains(loc)),
-                    )
+                    .take_while(|loc| Location::zero().square_range(map.size).contains(loc))
+                    .chain(b.iter_ray(-diff).take_while(|loc| Location::zero().square_range(map.size).contains(loc)))
             })
         })
         .unique()

@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::iter::successors;
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, Div, Mul, Neg, RangeInclusive, Sub};
 
 use num::{one, zero, Bounded, Num, Signed, Zero};
 
@@ -79,6 +79,10 @@ impl<T: Num + Copy + PartialOrd> Location<T> {
 
     pub fn iter_ray(self, direction: Location<T>) -> impl Iterator<Item = Location<T>> {
         successors(Some(self), move |&current| Some(current + direction))
+    }
+
+    pub fn square_range(self, end: Location<T>) -> RangeInclusive<Location<T>> {
+        self..=(end - Location::new(one(), one()))
     }
 }
 
