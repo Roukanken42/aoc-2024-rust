@@ -4,6 +4,7 @@ use itertools::Itertools;
 use nom::character::complete::{anychar, line_ending};
 use nom::combinator::map;
 use nom::multi::{many1, many_till};
+use num::Zero;
 use std::collections::HashMap;
 
 advent_of_code::solution!(8);
@@ -35,8 +36,24 @@ impl Map {
     }
 }
 
-pub fn part_one(input: &str) -> Option<u32> {
-    None
+pub fn part_one(input: &str) -> Option<usize> {
+    let (_, input) = parse(input).unwrap();
+    let map = Map::new(&input);
+
+    let result = map
+        .antennas
+        .iter()
+        .flat_map(|(_, same_antennas)| {
+            same_antennas.iter().tuple_combinations().flat_map(|(&a, &b)| {
+                let diff = a - b;
+                [a + diff, b - diff]
+            })
+        })
+        .filter(|loc| (Location::new(-1, -1)..map.size).contains(loc))
+        .unique()
+        .count();
+
+    Some(result)
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
@@ -81,7 +98,7 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(14));
     }
 
     #[test]
