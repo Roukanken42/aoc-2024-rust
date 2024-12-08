@@ -7,6 +7,7 @@ use nom::combinator::value;
 use nom::multi::many1;
 use num::Zero;
 use std::collections::{HashMap, HashSet};
+use std::ops::RangeInclusive;
 
 advent_of_code::solution!(6);
 
@@ -35,6 +36,7 @@ struct Map {
     obstacles: HashSet<Location<i32>>,
     start: Location<i32>,
     size: Location<i32>,
+    range: RangeInclusive<Location<i32>>,
 }
 
 impl Map {
@@ -47,6 +49,7 @@ impl Map {
             obstacles,
             start: guard,
             size,
+            range: Location::zero().square_range(size),
         }
     }
 }
@@ -60,7 +63,7 @@ pub fn part_one(input: &str) -> Option<usize> {
     let mut current = map.start;
     let mut direction = direction::UP;
 
-    while (Location::zero()..=(map.size - Location::new(1, 1))).contains(&current) {
+    while map.range.contains(&current) {
         visited.insert(current);
 
         while map.obstacles.contains(&(current + direction)) {
@@ -86,7 +89,7 @@ fn sim_obstacle_in_front(
     let mut direction = start_direction.rotate_90_cw();
     let mut local_visited_states = HashSet::new();
 
-    while (Location::zero()..=(map.size - Location::new(1, 1))).contains(&current) {
+    while map.range.contains(&current) {
         if visited_states.contains(&(current, direction)) || local_visited_states.contains(&(current, direction)) {
             return true;
         }
@@ -120,11 +123,11 @@ fn construct_shortcut_map(map: &Map) -> HashMap<(Location<i32>, Location<i32>), 
         );
         let delta = Location::new(if direction.x == 0 { 1 } else { 0 }, if direction.y == 0 { 1 } else { 0 });
 
-        while Location::zero().square_range(map.size).contains(&start) {
+        while map.range.contains(&start) {
             let mut current = start;
             let mut last_obstacle_hit = start + facing;
 
-            while Location::zero().square_range(map.size).contains(&current) {
+            while map.range.contains(&current) {
                 if map.obstacles.contains(&current) {
                     last_obstacle_hit = current + direction;
                 } else {
@@ -153,7 +156,7 @@ pub fn part_two(input: &str) -> Option<usize> {
     let mut direction = direction::UP;
     let mut extra_obstacle_positions = HashSet::new();
 
-    while Location::zero().square_range(map.size).contains(&current) {
+    while map.range.contains(&current) {
         visited_fields.insert(current);
         visited_states.insert((current, direction));
 
@@ -162,7 +165,7 @@ pub fn part_two(input: &str) -> Option<usize> {
             visited_states.insert((current, direction));
         }
 
-        if Location::zero().square_range(map.size).contains(&(current + direction)) && !visited_fields.contains(&(current + direction)) {
+        if map.range.contains(&(current + direction)) && !visited_fields.contains(&(current + direction)) {
             let obstacle_causes_loop = sim_obstacle_in_front(&map, current, direction, &visited_states, &shortcut_map);
             if obstacle_causes_loop {
                 extra_obstacle_positions.insert(current + direction);
