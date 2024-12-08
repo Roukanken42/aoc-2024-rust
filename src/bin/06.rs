@@ -59,7 +59,7 @@ pub fn part_one(input: &str) -> Option<usize> {
     let mut current = map.start;
     let mut direction = direction::UP;
 
-    while (Location::new(-1, -1)..map.size).contains(&current) {
+    while (Location::zero()..=(map.size - Location::new(1, 1))).contains(&current) {
         visited.insert(current);
 
         while map.obstacles.contains(&(current + direction)) {
@@ -84,7 +84,7 @@ fn sim_obstacle_in_front(
     let mut direction = start_direction.rotate_90_cw();
     let mut local_visited_states = HashSet::new();
 
-    while (Location::new(-1, -1)..map.size).contains(&current) {
+    while (Location::zero()..=(map.size - Location::new(1, 1))).contains(&current) {
         if visited_states.contains(&(current, direction)) || local_visited_states.contains(&(current, direction)) {
             return true;
         }

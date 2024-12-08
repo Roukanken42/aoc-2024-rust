@@ -199,9 +199,9 @@ impl<T> Access2d<T> for Vec<Vec<T>> {
 
 impl<T: Num + PartialOrd> PartialOrd for Location<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if (self.x < other.x) && (self.y < other.y) {
+        if (self.x < other.x) && (self.y <= other.y) || (self.x <= other.x) && (self.y < other.y) {
             Some(Ordering::Less)
-        } else if (self.x > other.x) || (self.y > other.y) {
+        } else if (self.x > other.x) && (self.y >= other.y) || (self.x >= other.x) && (self.y > other.y) {
             Some(Ordering::Greater)
         } else if self.x == other.x && self.y == other.y {
             Some(Ordering::Equal)
