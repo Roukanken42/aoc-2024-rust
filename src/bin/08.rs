@@ -4,12 +4,13 @@ use itertools::Itertools;
 use nom::character::complete::{anychar, line_ending};
 use nom::combinator::map;
 use nom::multi::{many1, many_till};
+use nom::IResult;
 use num::Zero;
 use std::collections::HashMap;
 
 advent_of_code::solution!(8);
 
-fn parse(input: &str) -> nom::IResult<&str, Vec<Vec<char>>> {
+fn parse(input: &str) -> IResult<&str, Vec<Vec<char>>> {
     let parse_line = map(many_till(anychar, line_ending), |x| x.0);
     parse_input(many1(parse_line))(input)
 }
