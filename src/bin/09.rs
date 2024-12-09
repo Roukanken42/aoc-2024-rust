@@ -2,6 +2,8 @@ use advent_of_code::utils::end_of_file;
 use itertools::Itertools;
 use nom::bytes::complete::take_while;
 use nom::IResult;
+use std::cmp::Reverse;
+use std::collections::{BinaryHeap, HashMap};
 
 advent_of_code::solution!(9);
 
@@ -24,15 +26,15 @@ pub fn part_one(input: &str) -> Option<usize> {
 
     let mut last_iter = input.iter().rev().copied().tuples().enumerate().map(|(i, (a, b))| (last_id - i, (a, b)));
 
-    let mut back_id = last_id;
-    let mut back_filled = 0u32;
+    let mut back_id;
+    let mut back_filled;
     let mut current_block = 0u32;
 
     (back_id, (back_filled, _)) = last_iter.next().unwrap();
 
     let mut checksum = 0usize;
     for (current_id, (&filled, &free)) in input.iter().tuples().enumerate() {
-        if (current_id == back_id) {
+        if current_id == back_id {
             checksum += contribute_checksum(current_block, back_filled) as usize * back_id;
             break;
         }
@@ -58,8 +60,48 @@ pub fn part_one(input: &str) -> Option<usize> {
     Some(checksum)
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
-    None
+pub fn part_two(input: &str) -> Option<usize> {
+    let (_, input) = parse(input).unwrap();
+
+    let mut free_spaces = (1..=9).map(|i| (i, BinaryHeap::new())).collect::<HashMap<_, _>>();
+
+    let mut current_block = 0u32;
+    for (filled, free) in input.iter().tuples() {
+        if free > &0 {
+            free_spaces.get_mut(free).unwrap().push(Reverse(current_block + filled));
+        }
+        current_block += filled + free;
+    }
+
+    current_block += input.last().unwrap();
+
+    let mut checksum = 0usize;
+
+    for (i, (&filled, &free)) in input.iter().rev().tuples().enumerate() {
+        let id = input.len() / 2 - i;
+        current_block -= filled;
+
+        let space_size = (filled..=9)
+            .filter(|size| free_spaces.get(size).unwrap().peek().unwrap_or(&Reverse(0)) > &Reverse(current_block))
+            .max_by_key(|size| free_spaces.get(size).unwrap().peek().unwrap_or(&Reverse(u32::MAX)))
+            .unwrap_or(0);
+
+        let tree = free_spaces.get_mut(&space_size);
+        if tree.is_none_or(|tree| tree.is_empty()) {
+            checksum += contribute_checksum(current_block, filled) as usize * id;
+        } else {
+            let Reverse(block) = free_spaces.get_mut(&space_size).unwrap().pop().unwrap();
+            checksum += contribute_checksum(block, filled) as usize * id;
+
+            if space_size > filled {
+                free_spaces.get_mut(&(space_size - filled)).unwrap().push(Reverse(block + filled));
+            }
+        }
+
+        current_block -= free;
+    }
+
+    Some(checksum)
 }
 
 #[cfg(test)]
@@ -93,6 +135,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(2858));
     }
 }
