@@ -2,8 +2,6 @@ use advent_of_code::utils::end_of_file;
 use itertools::Itertools;
 use nom::bytes::complete::take_while;
 use nom::IResult;
-use std::cmp::Reverse;
-use std::collections::{BinaryHeap, HashMap};
 
 advent_of_code::solution!(9);
 
@@ -63,39 +61,36 @@ pub fn part_one(input: &str) -> Option<usize> {
 pub fn part_two(input: &str) -> Option<usize> {
     let (_, input) = parse(input).unwrap();
 
-    let mut free_spaces = (1..=9).map(|i| (i, BinaryHeap::new())).collect::<HashMap<_, _>>();
-
+    let mut free_spaces = vec![];
     let mut current_block = 0u32;
+
     for (filled, free) in input.iter().tuples() {
-        if free > &0 {
-            free_spaces.get_mut(free).unwrap().push(Reverse(current_block + filled));
-        }
+        free_spaces.push((current_block + filled, *free));
         current_block += filled + free;
     }
 
     current_block += input.last().unwrap();
 
     let mut checksum = 0usize;
+    let mut memo = vec![0; 10];
 
     for (i, (&filled, &free)) in input.iter().rev().tuples().enumerate() {
         let id = input.len() / 2 - i;
         current_block -= filled;
 
-        let space_size = (filled..=9)
-            .filter(|size| free_spaces.get(size).unwrap().peek().unwrap_or(&Reverse(0)) > &Reverse(current_block))
-            .max_by_key(|size| free_spaces.get(size).unwrap().peek().unwrap_or(&Reverse(u32::MAX)))
-            .unwrap_or(0);
+        let mut target = memo[filled as usize];
+        while target < id && free_spaces[target].1 < filled {
+            target += 1;
+        }
 
-        let tree = free_spaces.get_mut(&space_size);
-        if tree.is_none_or(|tree| tree.is_empty()) {
-            checksum += contribute_checksum(current_block, filled) as usize * id;
-        } else {
-            let Reverse(block) = free_spaces.get_mut(&space_size).unwrap().pop().unwrap();
+        if target < id {
+            let (block, space_size) = free_spaces[target];
+
             checksum += contribute_checksum(block, filled) as usize * id;
-
-            if space_size > filled {
-                free_spaces.get_mut(&(space_size - filled)).unwrap().push(Reverse(block + filled));
-            }
+            free_spaces[target] = (block + filled, space_size - filled);
+            memo[filled as usize] = target;
+        } else {
+            checksum += contribute_checksum(current_block, filled) as usize * id;
         }
 
         current_block -= free;

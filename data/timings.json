@@ -1,58 +1,58 @@
 {
   "data": [
     {
-      "total_nanos": 177400,
-      "part_2": "95.1µs",
       "part_1": "82.3µs",
-      "day": "01"
+      "day": "01",
+      "total_nanos": 177400,
+      "part_2": "95.1µs"
     },
     {
-      "day": "02",
-      "total_nanos": 508600,
       "part_2": "264.1µs",
-      "part_1": "244.5µs"
+      "total_nanos": 508600,
+      "part_1": "244.5µs",
+      "day": "02"
     },
     {
-      "part_2": "206.1µs",
+      "total_nanos": 418300,
       "part_1": "212.2µs",
-      "day": "03",
-      "total_nanos": 418300
+      "part_2": "206.1µs",
+      "day": "03"
     },
     {
-      "total_nanos": 1984100,
-      "part_1": "784.1µs",
       "part_2": "1.2ms",
-      "day": "04"
+      "day": "04",
+      "total_nanos": 1984100,
+      "part_1": "784.1µs"
     },
     {
-      "part_1": "190.8µs",
+      "part_2": "260.9µs",
       "total_nanos": 451700,
       "day": "05",
-      "part_2": "260.9µs"
+      "part_1": "190.8µs"
     },
     {
       "total_nanos": 24299500,
+      "part_1": "499.5µs",
       "part_2": "23.8ms",
-      "day": "06",
-      "part_1": "499.5µs"
+      "day": "06"
     },
     {
-      "total_nanos": 3100000,
       "part_1": "1.1ms",
-      "day": "07",
-      "part_2": "2.0ms"
+      "total_nanos": 3100000,
+      "part_2": "2.0ms",
+      "day": "07"
     },
     {
-      "part_2": "85.4µs",
-      "total_nanos": 138900,
       "part_1": "53.5µs",
-      "day": "08"
+      "total_nanos": 138900,
+      "day": "08",
+      "part_2": "85.4µs"
     },
     {
+      "part_2": "119.5µs",
       "day": "09",
-      "part_1": "55.9µs",
-      "part_2": "1.1ms",
-      "total_nanos": 1155900
+      "total_nanos": 199700,
+      "part_1": "80.2µs"
     }
   ]
 }
