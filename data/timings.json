@@ -1,58 +1,64 @@
 {
   "data": [
     {
-      "part_1": "82.3µs",
+      "part_2": "93.7µs",
       "day": "01",
-      "total_nanos": 177400,
-      "part_2": "95.1µs"
+      "part_1": "83.7µs",
+      "total_nanos": 177400
     },
     {
-      "part_2": "264.1µs",
-      "total_nanos": 508600,
-      "part_1": "244.5µs",
-      "day": "02"
+      "part_2": "270.0µs",
+      "day": "02",
+      "part_1": "245.6µs",
+      "total_nanos": 515600
     },
     {
-      "total_nanos": 418300,
-      "part_1": "212.2µs",
-      "part_2": "206.1µs",
-      "day": "03"
+      "day": "03",
+      "part_1": "243.1µs",
+      "part_2": "231.4µs",
+      "total_nanos": 474500
     },
     {
+      "part_1": "840.7µs",
+      "total_nanos": 2040700,
       "part_2": "1.2ms",
-      "day": "04",
-      "total_nanos": 1984100,
-      "part_1": "784.1µs"
+      "day": "04"
     },
     {
-      "part_2": "260.9µs",
-      "total_nanos": 451700,
       "day": "05",
-      "part_1": "190.8µs"
+      "part_1": "176.0µs",
+      "part_2": "263.4µs",
+      "total_nanos": 439400
     },
     {
-      "total_nanos": 24299500,
-      "part_1": "499.5µs",
-      "part_2": "23.8ms",
-      "day": "06"
+      "part_2": "24.0ms",
+      "day": "06",
+      "total_nanos": 24504100,
+      "part_1": "504.1µs"
     },
     {
       "part_1": "1.1ms",
-      "total_nanos": 3100000,
       "part_2": "2.0ms",
-      "day": "07"
+      "day": "07",
+      "total_nanos": 3100000
     },
     {
-      "part_1": "53.5µs",
-      "total_nanos": 138900,
+      "part_1": "49.6µs",
+      "total_nanos": 137700,
       "day": "08",
-      "part_2": "85.4µs"
+      "part_2": "88.1µs"
     },
     {
-      "part_2": "119.5µs",
+      "part_1": "57.7µs",
       "day": "09",
-      "total_nanos": 199700,
-      "part_1": "80.2µs"
+      "part_2": "1.1ms",
+      "total_nanos": 1157700
+    },
+    {
+      "day": "10",
+      "part_1": "1.3ms",
+      "total_nanos": 1979500,
+      "part_2": "679.5µs"
     }
   ]
 }

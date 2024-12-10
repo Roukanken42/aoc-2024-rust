@@ -5,7 +5,7 @@ use std::ops::{Add, Div, Mul, Neg, RangeInclusive, Sub};
 
 use num::{one, zero, Bounded, Num, Signed, Zero};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord)]
 pub struct Location<T: Num> {
     pub x: T,
     pub y: T,
