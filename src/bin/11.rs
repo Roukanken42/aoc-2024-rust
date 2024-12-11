@@ -62,6 +62,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     let memo = &mut HashMap::new();
     Some(input.iter().map(|&stone| next_memo(stone, 75, memo)).sum())
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
