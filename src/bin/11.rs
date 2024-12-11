@@ -7,8 +7,27 @@ fn parse(input: &str) -> IResult<&str, Vec<u64>> {
     parse_input(Vec::parse)(input)
 }
 
-pub fn part_one(input: &str) -> Option<u32> {
-    None
+fn next(stone: u64, step: u64) -> u64 {
+    if step == 0 {
+        return 1;
+    }
+    if stone == 0 {
+        return next(1, step - 1);
+    }
+
+    let digits = stone.ilog10() + 1;
+    if digits % 2 == 0 {
+        let half = 10u64.pow(digits / 2);
+        next(stone / half, step - 1) + next(stone % half, step - 1)
+    } else {
+        next(stone * 2024, step - 1)
+    }
+}
+
+pub fn part_one(input: &str) -> Option<u64> {
+    let (_, input) = parse(input).unwrap();
+
+    Some(input.iter().map(|&stone| next(stone, 25)).sum())
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
@@ -31,7 +50,7 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(55312));
     }
 
     #[test]
