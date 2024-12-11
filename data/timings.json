@@ -7,58 +7,64 @@
       "total_nanos": 177400
     },
     {
-      "part_2": "270.0µs",
       "day": "02",
-      "part_1": "245.6µs",
-      "total_nanos": 515600
+      "part_2": "270.0µs",
+      "total_nanos": 515600,
+      "part_1": "245.6µs"
     },
     {
-      "day": "03",
-      "part_1": "243.1µs",
       "part_2": "231.4µs",
+      "part_1": "243.1µs",
+      "day": "03",
       "total_nanos": 474500
     },
     {
-      "part_1": "840.7µs",
       "total_nanos": 2040700,
+      "day": "04",
       "part_2": "1.2ms",
-      "day": "04"
+      "part_1": "840.7µs"
     },
     {
-      "day": "05",
-      "part_1": "176.0µs",
       "part_2": "263.4µs",
-      "total_nanos": 439400
+      "total_nanos": 439400,
+      "day": "05",
+      "part_1": "176.0µs"
     },
     {
+      "part_1": "504.1µs",
       "part_2": "24.0ms",
-      "day": "06",
       "total_nanos": 24504100,
-      "part_1": "504.1µs"
+      "day": "06"
     },
     {
+      "total_nanos": 3100000,
       "part_1": "1.1ms",
-      "part_2": "2.0ms",
       "day": "07",
-      "total_nanos": 3100000
+      "part_2": "2.0ms"
     },
     {
-      "part_1": "49.6µs",
-      "total_nanos": 137700,
       "day": "08",
+      "total_nanos": 137700,
+      "part_1": "49.6µs",
       "part_2": "88.1µs"
     },
     {
+      "total_nanos": 1157700,
       "part_1": "57.7µs",
       "day": "09",
-      "part_2": "1.1ms",
-      "total_nanos": 1157700
+      "part_2": "1.1ms"
     },
     {
       "day": "10",
-      "part_1": "1.3ms",
+      "part_2": "679.5µs",
       "total_nanos": 1979500,
-      "part_2": "679.5µs"
+      "part_1": "1.3ms"
+    },
+    {
+      "total_nanos": 25200000,
+      "part_1": "1.7ms",
+      "day": "11",
+      "part_2": "23.5ms"
     }
   ]
 }
