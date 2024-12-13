@@ -44,26 +44,24 @@ fn parse(input: &str) -> IResult<&str, Vec<Machine>> {
     parse_input_by_lines(Machine::parse)(input)
 }
 
+fn solve(a: Location<i64>, b: Location<i64>, p: Location<i64>) -> Option<i64> {
+    let b_count = (a.y * p.x - a.x * p.y) / (b.x * a.y - b.y * a.x);
+    let a_count = (p.x - b.x * b_count) / a.x;
+
+    if (a * a_count + b * b_count) != p {
+        None
+    } else {
+        Some(a_count * 3 + b_count)
+    }
+}
+
 pub fn part_one(input: &str) -> Option<i64> {
     let (_, machines) = parse(input).unwrap();
 
     Some(
         machines
             .iter()
-            .flat_map(|machine| {
-                let a = machine.button_a;
-                let b = machine.button_b;
-                let p = machine.prize;
-
-                let b_count = (a.y * p.x - a.x * p.y) / (b.x * a.y - b.y * a.x);
-                let a_count = (p.x - b.x * b_count) / a.x;
-
-                if (a * a_count + b * b_count) != p {
-                    None
-                } else {
-                    Some(a_count * 3 + b_count)
-                }
-            })
+            .flat_map(|machine| solve(machine.button_a, machine.button_b, machine.prize))
             .sum(),
     )
 }
@@ -75,18 +73,11 @@ pub fn part_two(input: &str) -> Option<i64> {
         machines
             .iter()
             .flat_map(|machine| {
-                let a = machine.button_a;
-                let b = machine.button_b;
-                let p = machine.prize + Location::new(10000000000000, 10000000000000);
-
-                let b_count = (a.y * p.x - a.x * p.y) / (b.x * a.y - b.y * a.x);
-                let a_count = (p.x - b.x * b_count) / a.x;
-
-                if (a * a_count + b * b_count) != p {
-                    None
-                } else {
-                    Some(a_count * 3 + b_count)
-                }
+                solve(
+                    machine.button_a,
+                    machine.button_b,
+                    machine.prize + Location::new(10000000000000, 10000000000000),
+                )
             })
             .sum(),
     )
@@ -95,6 +86,7 @@ pub fn part_two(input: &str) -> Option<i64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use nom::Parser;
 
     #[test]
     fn test_parse_location() {
@@ -145,6 +137,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(875318608908));
     }
 }
