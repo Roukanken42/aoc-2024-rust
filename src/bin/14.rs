@@ -16,7 +16,7 @@ fn parse_location(input: &str) -> IResult<&str, Location<i32>> {
     map(separated_pair(i32::parse, tag(","), i32::parse), |(x, y)| Location::new(x, y))(input)
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 struct Robot {
     position: Location<i32>,
     velocity: Location<i32>,
@@ -39,6 +39,10 @@ impl Robot {
 
     fn step(&mut self, area_size: &Location<i32>) {
         self.position = self.simulate_pos(1, area_size);
+    }
+
+    fn step_by(&mut self, by: i32, area_size: &Location<i32>) {
+        self.position = self.simulate_pos(by, area_size);
     }
 }
 
@@ -66,7 +70,7 @@ pub fn part_one_inner(input: &str, size: Location<i32>) -> Option<usize> {
 }
 
 pub fn part_two(input: &str) -> Option<usize> {
-    part_two_inner(input, Location::new(101, 103), 10_000)
+    part_two_inner(input, Location::new(101, 103))
 }
 
 #[allow(dead_code)]
@@ -88,26 +92,51 @@ pub fn part_two_generate_images(input: &str, size: Location<i32>, max: i32) -> O
     None
 }
 
-pub fn part_two_inner(input: &str, size: Location<i32>, max: i32) -> Option<usize> {
+pub fn part_two_inner(input: &str, size: Location<i32>) -> Option<usize> {
     let (_, robots) = parse(input).unwrap();
 
-    let mut robots = robots;
-    let mut variances = vec![];
+    let find_min = |vec: &Vec<i32>| {
+        vec.iter()
+            .enumerate()
+            .map(|(i, &variance)| (variance, i))
+            .min()
+            .map(|(_, i)| i)
+            .unwrap_or(0)
+    };
 
-    let len = robots.len();
+    let len = robots.len() as i32;
 
-    for iter in 0..max {
-        let sum: Location<i32> = robots.iter().map(|robot| robot.position).sum();
-        let mean = sum / len as i32;
-        let variance_x = robots.iter().map(|robot| (robot.position.x - mean.x).pow(2)).sum::<i32>() / len as i32;
-        let variance_y = robots.iter().map(|robot| (robot.position.y - mean.y).pow(2)).sum::<i32>() / len as i32;
+    let mut variances_x = vec![];
+    let mut robots_x = robots.iter().copied().collect::<Vec<_>>();
+    for _ in 0..size.x {
+        let sum = robots_x.iter().map(|robot| robot.position.x).sum::<i32>();
+        let mean = sum / len;
 
-        variances.push(variance_x * variance_y);
+        let variance = robots_x.iter().map(|robot| (robot.position.x - mean).pow(2)).sum::<i32>() / len;
+        variances_x.push(variance);
 
-        robots.iter_mut().for_each(|robot| robot.step(&size));
+        robots_x.iter_mut().for_each(|robot| robot.step(&size));
     }
 
-    variances.iter().enumerate().map(|(i, &variance)| (variance, i)).min().map(|(_, i)| i)
+    let min_x = find_min(&variances_x);
+
+    let mut variances_y = vec![];
+    let mut robots_y = robots.iter().copied().collect::<Vec<_>>();
+    robots_y.iter_mut().for_each(|robot| robot.step_by(min_x as i32, &size));
+
+    for _ in 0..size.y {
+        let sum = robots_y.iter().map(|robot| robot.position.y).sum::<i32>();
+        let mean = sum / len;
+
+        let variance = robots_y.iter().map(|robot| (robot.position.y - mean).pow(2)).sum::<i32>() / len;
+        variances_y.push(variance);
+
+        robots_y.iter_mut().for_each(|robot| robot.step_by(size.x, &size));
+    }
+
+    let min_y = find_min(&variances_y);
+
+    Some(min_x + min_y * size.x as usize)
 }
 
 #[cfg(test)]
