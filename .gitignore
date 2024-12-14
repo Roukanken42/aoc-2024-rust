@@ -138,6 +138,8 @@ data/inputs/*
 !data/inputs/.keep
 data/puzzles/*
 !data/puzzles/.keep
+data/outputs/day14/*
+!data/outputs/day14/.keep
 
 # Dhat
 dhat-heap.json

@@ -1,5 +1,6 @@
 use advent_of_code::utils::location::Location;
 use advent_of_code::utils::{parse_input_by_lines, Parsable};
+use image::ImageBuffer;
 use itertools::Itertools;
 use nom::bytes::complete::tag;
 use nom::character::complete::space1;
@@ -35,6 +36,10 @@ impl Robot {
     fn simulate_pos(&self, time: i32, area_size: &Location<i32>) -> Location<i32> {
         (self.position + self.velocity * time).rem_euclid(area_size)
     }
+
+    fn step(&mut self, area_size: &Location<i32>) {
+        self.position = self.simulate_pos(1, area_size);
+    }
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Robot>> {
@@ -61,10 +66,24 @@ pub fn part_one_inner(input: &str, size: Location<i32>) -> Option<usize> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    part_two_inner(input, Location::new(101, 103))
+    part_two_inner(input, Location::new(101, 103), 10_000)
 }
 
-pub fn part_two_inner(input: &str, size: Location<i32>) -> Option<u32> {
+pub fn part_two_inner(input: &str, size: Location<i32>, max: i32) -> Option<u32> {
+    let (_, robots) = parse(input).unwrap();
+
+    let mut robots = robots;
+
+    for iter in 1..max {
+        robots.iter_mut().for_each(|robot| robot.step(&size));
+
+        let mut image = ImageBuffer::new(size.x as u32, size.y as u32);
+        for robot in robots.iter() {
+            image.put_pixel(robot.position.x as u32, robot.position.y as u32, image::Rgb([255u8, 255u8, 255u8]));
+        }
+        image.save(format!("data/outputs/day14/{:04}.png", iter)).unwrap();
+    }
+
     None
 }
 
@@ -114,11 +133,5 @@ mod tests {
     fn test_part_one() {
         let result = part_one_inner(&advent_of_code::template::read_file("examples", DAY), Location::new(11, 7));
         assert_eq!(result, Some(12));
-    }
-
-    #[test]
-    fn test_part_two() {
-        let result = part_two_inner(&advent_of_code::template::read_file("examples", DAY), Location::new(11, 7));
-        assert_eq!(result, None);
     }
 }
