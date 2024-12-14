@@ -1,8 +1,9 @@
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::iter::successors;
-use std::ops::{Add, Div, Mul, Neg, RangeInclusive, Sub};
+use std::ops::{Add, Div, Mul, Neg, RangeInclusive, Rem, Sub};
 
+use num::traits::Euclid;
 use num::{one, zero, Bounded, Num, Signed, Zero};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord)]
@@ -153,6 +154,32 @@ impl<T: Num + Copy> Div<T> for Location<T> {
 
     fn div(self, rhs: T) -> Self::Output {
         Location::new(self.x / rhs, self.y / rhs)
+    }
+}
+
+impl<T: Num + Copy> Div<Self> for Location<T> {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        Location::new(self.x / rhs.x, self.y / rhs.y)
+    }
+}
+
+impl<T: Num + Copy> Rem<Self> for Location<T> {
+    type Output = Self;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        Location::new(self.x % rhs.x, self.y % rhs.y)
+    }
+}
+
+impl<T: Num + Copy + Euclid> Euclid for Location<T> {
+    fn div_euclid(&self, rhs: &Self) -> Self {
+        Location::new(self.x.div_euclid(&rhs.x), self.y.div_euclid(&rhs.y))
+    }
+
+    fn rem_euclid(&self, rhs: &Self) -> Self {
+        Location::new(self.x.rem_euclid(&rhs.x), self.y.rem_euclid(&rhs.y))
     }
 }
 
