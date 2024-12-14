@@ -65,11 +65,12 @@ pub fn part_one_inner(input: &str, size: Location<i32>) -> Option<usize> {
     Some(res)
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
+pub fn part_two(input: &str) -> Option<usize> {
     part_two_inner(input, Location::new(101, 103), 10_000)
 }
 
-pub fn part_two_inner(input: &str, size: Location<i32>, max: i32) -> Option<u32> {
+#[allow(dead_code)]
+pub fn part_two_generate_images(input: &str, size: Location<i32>, max: i32) -> Option<u32> {
     let (_, robots) = parse(input).unwrap();
 
     let mut robots = robots;
@@ -85,6 +86,28 @@ pub fn part_two_inner(input: &str, size: Location<i32>, max: i32) -> Option<u32>
     }
 
     None
+}
+
+pub fn part_two_inner(input: &str, size: Location<i32>, max: i32) -> Option<usize> {
+    let (_, robots) = parse(input).unwrap();
+
+    let mut robots = robots;
+    let mut variances = vec![];
+
+    let len = robots.len();
+
+    for iter in 0..max {
+        let sum: Location<i32> = robots.iter().map(|robot| robot.position).sum();
+        let mean = sum / len as i32;
+        let variance_x = robots.iter().map(|robot| (robot.position.x - mean.x).pow(2)).sum::<i32>() / len as i32;
+        let variance_y = robots.iter().map(|robot| (robot.position.y - mean.y).pow(2)).sum::<i32>() / len as i32;
+
+        variances.push(variance_x * variance_y);
+
+        robots.iter_mut().for_each(|robot| robot.step(&size));
+    }
+
+    variances.iter().enumerate().map(|(i, &variance)| (variance, i)).min().map(|(_, i)| i)
 }
 
 #[cfg(test)]

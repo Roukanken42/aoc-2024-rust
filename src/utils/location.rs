@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
-use std::iter::successors;
+use std::iter::{successors, Sum};
 use std::ops::{Add, Div, Mul, Neg, RangeInclusive, Rem, Sub};
 
 use num::traits::Euclid;
@@ -198,6 +198,12 @@ impl<T: Num + Copy + Signed> Neg for Location<T> {
 
     fn neg(self) -> Self::Output {
         Location::new(-self.x, -self.y)
+    }
+}
+
+impl<T: Num + Copy> Sum for Location<T> {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Location::zero(), Add::add)
     }
 }
 
