@@ -8,6 +8,7 @@ use nom::combinator::{opt, value};
 use nom::multi::{many1, separated_list1};
 use nom::sequence::preceded;
 use nom::IResult;
+use Tile::Robot;
 
 advent_of_code::solution!(15);
 
@@ -22,10 +23,10 @@ enum Tile {
 impl Parsable<'_> for Tile {
     fn parse(input: &str) -> IResult<&str, Self> {
         alt((
-            value(Tile::Empty, char('.')),
-            value(Tile::Wall, char('#')),
-            value(Tile::Box, char('O')),
-            value(Tile::Robot, char('@')),
+            value(Empty, char('.')),
+            value(Wall, char('#')),
+            value(Box, char('O')),
+            value(Robot, char('@')),
         ))(input)
     }
 }
@@ -51,7 +52,7 @@ impl Parsable<'_> for Input {
         let (input, _) = many1(line_ending)(input)?;
         let (input, moves) = many1(preceded(opt(line_ending), parse_direction))(input)?;
 
-        let robot = map.iter_2d_keys().find(|&loc| map.get_2d(loc) == Some(&Tile::Robot)).unwrap();
+        let robot = map.iter_2d_keys().find(|&loc| map.get_2d(loc) == Some(&Robot)).unwrap();
         map.set_2d(robot, Empty);
 
         let (input, _) = end_of_file(input)?;
@@ -60,8 +61,35 @@ impl Parsable<'_> for Input {
     }
 }
 
-pub fn part_one(_input: &str) -> Option<u32> {
-    None
+pub fn part_one(input: &str) -> Option<i32> {
+    let (_, input) = Input::parse(input).unwrap();
+
+    let mut map = input.map;
+    let mut robot = input.robot;
+
+    for dir in input.moves {
+        let new_robot = robot + dir;
+
+        match map.get_2d(new_robot) {
+            Some(Empty) => robot = new_robot,
+            Some(Box) => {
+                let first_non_box = new_robot.iter_ray(dir).find(|loc| map.get_2d(*loc) != Some(&Box)).unwrap();
+                if let Some(Empty) = map.get_2d(first_non_box) {
+                    map.set_2d(first_non_box, Box);
+                    map.set_2d(new_robot, Empty);
+                    robot = new_robot;
+                }
+            }
+            _ => { /* no op */ }
+        }
+    }
+
+    Some(
+        map.iter_2d_keys()
+            .filter(|&loc| map.get_2d(loc) == Some(&Box))
+            .map(|loc| loc.x + loc.y * 100)
+            .sum(),
+    )
 }
 
 pub fn part_two(_input: &str) -> Option<u32> {
@@ -91,13 +119,13 @@ mod tests {
     #[test]
     fn test_part_one_small() {
         let result = part_one(&advent_of_code::template::read_file_part("examples", DAY, 1));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(2028));
     }
 
     #[test]
     fn test_part_one_large() {
         let result = part_one(&advent_of_code::template::read_file_part("examples", DAY, 2));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(10092));
     }
 
     #[test]
