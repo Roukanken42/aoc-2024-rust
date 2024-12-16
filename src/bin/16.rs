@@ -36,18 +36,18 @@ fn parse(input: &str) -> IResult<&str, Vec<Vec<Tile>>> {
     parse_input_by_lines(many1(Tile::parse))(input)
 }
 
-pub fn part_one(input: &str) -> Option<u32> {
+pub fn part_one(input: &str) -> Option<i32> {
     let (_, map) = parse(input).unwrap();
 
     let start = map.iter_2d_keys().find(|&loc| map.get_2d(loc) == Some(&Start)).unwrap();
+    let end = map.iter_2d_keys().find(|&loc| map.get_2d(loc) == Some(&End)).unwrap();
 
     let mut queue = BinaryHeap::new();
-    queue.push(Reverse((0, start, RIGHT)));
+    queue.push(Reverse((start.manhattan_distance(end), 0, start, RIGHT)));
 
     let mut visited = HashMap::new();
 
-    // TODO: A* ?
-    while let Some(Reverse((steps, loc, dir))) = queue.pop() {
+    while let Some(Reverse((_, steps, loc, dir))) = queue.pop() {
         if visited.contains_key(&(loc, dir)) {
             continue;
         }
@@ -59,11 +59,11 @@ pub fn part_one(input: &str) -> Option<u32> {
 
         let new_loc = loc + dir;
         if map.get_2d(new_loc) != Some(&Wall) {
-            queue.push(Reverse((steps + 1, new_loc, dir)));
+            queue.push(Reverse((new_loc.manhattan_distance(end) + steps + 1, steps + 1, new_loc, dir)));
         }
 
         for &new_dir in [dir.rotate_90_cw(), dir.rotate_90_ccw()].iter() {
-            queue.push(Reverse((steps + 1_000, loc, new_dir)));
+            queue.push(Reverse((loc.manhattan_distance(end) + steps + 1_000, steps + 1_000, loc, new_dir)));
         }
     }
 
@@ -91,12 +91,8 @@ pub fn part_two(input: &str) -> Option<usize> {
         }
         visited.entry((loc, dir)).or_insert_with(|| (steps, HashSet::new())).1.insert(last_tile);
 
-        if map.get_2d(loc) == Some(&End) {
+        if map.get_2d(loc) == Some(&End) || found_end {
             found_end = true;
-            continue;
-        }
-
-        if found_end {
             continue;
         }
 
@@ -124,7 +120,7 @@ pub fn part_two(input: &str) -> Option<usize> {
         }
     }
 
-    Some(best_paths.iter().map(|&(loc, _)| loc).unique().count())
+    Some(best_paths.iter().unique_by(|&(loc, _)| loc).count())
 }
 
 #[cfg(test)]
