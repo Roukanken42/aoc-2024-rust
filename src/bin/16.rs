@@ -2,6 +2,7 @@ use crate::Tile::{Empty, End, Start, Wall};
 use advent_of_code::utils::location::direction::{DOWN, LEFT, RIGHT, UP};
 use advent_of_code::utils::location::Access2d;
 use advent_of_code::utils::{parse_input_by_lines, Parsable};
+use hashbrown::{HashMap, HashSet};
 use itertools::Itertools;
 use nom::branch::alt;
 use nom::character::complete::char;
@@ -9,7 +10,7 @@ use nom::combinator::value;
 use nom::multi::many1;
 use nom::IResult;
 use std::cmp::Reverse;
-use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::collections::BinaryHeap;
 
 advent_of_code::solution!(16);
 
@@ -79,7 +80,7 @@ pub fn part_two(input: &str) -> Option<usize> {
     let mut queue = BinaryHeap::new();
     queue.push(Reverse((0, start, RIGHT, (start, RIGHT))));
 
-    let mut visited: HashMap<_, (i32, HashSet<_>)> = HashMap::new();
+    let mut visited: HashMap<_, (_, HashSet<_>)> = HashMap::new();
     let mut found_end = false;
 
     while let Some(Reverse((steps, loc, dir, last_tile))) = queue.pop() {
@@ -101,7 +102,7 @@ pub fn part_two(input: &str) -> Option<usize> {
             queue.push(Reverse((steps + 1, new_loc, dir, (loc, dir))));
         }
 
-        for &new_dir in [dir.rotate_90_cw(), dir.rotate_90_ccw()].iter() {
+        for new_dir in [dir.rotate_90_cw(), dir.rotate_90_ccw()] {
             queue.push(Reverse((steps + 1_000, loc, new_dir, (loc, dir))));
         }
     }
