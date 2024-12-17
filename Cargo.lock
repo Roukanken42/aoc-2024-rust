@@ -32,7 +32,7 @@ dependencies = [
  "hashbrown",
  "image",
  "itertools 0.13.0",
-    "log",
+ "log",
  "nom",
  "num",
  "pico-args",
