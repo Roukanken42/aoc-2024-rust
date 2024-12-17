@@ -80,17 +80,17 @@ pub fn part_two(input: &str) -> Option<usize> {
     let mut queue = BinaryHeap::new();
     queue.push(Reverse((0, start, RIGHT, (start, RIGHT))));
 
-    let mut visited: HashMap<_, (_, HashSet<_>)> = HashMap::new();
+    let mut visited: HashMap<_, (_, Vec<_>)> = HashMap::new();
     let mut found_end = false;
 
     while let Some(Reverse((steps, loc, dir, last_tile))) = queue.pop() {
         if let Some((min_steps, last_tiles)) = visited.get_mut(&(loc, dir)) {
             if min_steps == &steps {
-                last_tiles.insert(last_tile);
+                last_tiles.push(last_tile);
             }
             continue;
         }
-        visited.entry((loc, dir)).or_insert_with(|| (steps, HashSet::new())).1.insert(last_tile);
+        visited.entry((loc, dir)).or_insert_with(|| (steps, Vec::new())).1.push(last_tile);
 
         if map.get_2d(loc) == Some(&End) || found_end {
             found_end = true;
