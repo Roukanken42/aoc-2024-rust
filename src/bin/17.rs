@@ -1,6 +1,4 @@
 use advent_of_code::utils::{end_of_file, Parsable};
-use hashbrown::HashSet;
-use itertools::{iproduct, Itertools};
 use nom::bytes::complete::tag;
 use nom::character::complete::line_ending;
 use nom::multi::{many1, separated_list1};
@@ -118,38 +116,15 @@ impl Computer {
 
     fn execute_instruction(&mut self, instruction: Instruction) -> Option<u64> {
         match instruction {
-            Instruction::Adv(operand) => {
-                self.reg_a >>= self.eval_combo_operand(operand);
-                // println!("setting A to {:b}", self.reg_a);
-            }
-            Instruction::Bxl(value) => {
-                self.reg_b ^= value;
-                // println!("xoring B with {:b} to {:?}", value, self.reg_b);
-            }
-            Instruction::Bst(operand) => {
-                self.reg_b = self.eval_combo_operand(operand) % 8;
-                // println!("xoring B with {:?} to {:?}", operand, self.reg_b);
-            }
-            Instruction::Jnz(value) => {
-                self.pointer = if self.reg_a == 0 { self.pointer } else { value as usize };
-                // println!()
-            }
-            Instruction::Bxc() => {
-                self.reg_b ^= self.reg_c;
-                // println!("Xoring B with C xor {:b} = {:b}", self.reg_c % 8, self.reg_b % 8);
-            }
+            Instruction::Adv(operand) => self.reg_a >>= self.eval_combo_operand(operand),
+            Instruction::Bxl(value) => self.reg_b ^= value,
+            Instruction::Bst(operand) => self.reg_b = self.eval_combo_operand(operand) % 8,
+            Instruction::Jnz(value) => self.pointer = if self.reg_a == 0 { self.pointer } else { value as usize },
+            Instruction::Bxc() => self.reg_b ^= self.reg_c,
             Instruction::Out(operand) => return Some(self.eval_combo_operand(operand) % 8),
-            Instruction::Bdv(operand) => {
-                self.reg_b = self.reg_a >> self.eval_combo_operand(operand);
-                // println!("dividing B to {:?}", self.reg_b);
-            }
-            Instruction::Cdv(operand) => {
-                self.reg_c = self.reg_a >> self.eval_combo_operand(operand);
-                // println!("dividing C to {:?}", self.reg_c);
-            }
+            Instruction::Bdv(operand) => self.reg_b = self.reg_a >> self.eval_combo_operand(operand),
+            Instruction::Cdv(operand) => self.reg_c = self.reg_a >> self.eval_combo_operand(operand),
         }
-
-        // println!("{:?}", self);
 
         None
     }
@@ -165,77 +140,35 @@ pub fn part_one(input: &str) -> Option<String> {
     Some(computer.iter_execute().map(|x| x.to_string()).collect::<Vec<_>>().join(","))
 }
 
-pub fn part_two(input: &str) -> Option<u64> {
-    let (_, computer) = Computer::parse(input).unwrap();
+fn find(program: &[u64], state: (u64, usize)) -> Option<u64> {
+    let (a, index) = state;
+    let b = *program.get(index).unwrap_or(&0);
 
-    let mut expected = vec![0];
-    let mut working = HashSet::new();
-    //
-    // for byte in computer.memory.iter().rev() {
-    //     expected.insert(0, byte);
-    //
-    //     let mut new_working = HashSet::new();
-    //
-    //     for previous_a in working.iter().map(|(a, _, _)| a).unique() {
-    //         for (a, b, c) in iproduct!(0..8, 0..8, 0..8) {
-    //             let mut sim = computer.clone();
-    //             sim.reg_a = previous_a << 3 + a;
-    //             sim.reg_b = b;
-    //             sim.reg_c = c;
-    //
-    //             let res = sim.iter_execute().collect::<Vec<_>>();
-    //             println!("{:?}", res);
-    //             let matches_prefix = res.iter().zip(expected.iter()).all(|(&left, &&right)| left == right);
-    //             if matches_prefix {
-    //                 new_working.insert((a, b, c));
-    //             }
-    //         }
-    //     }
-    //
-    //     working = new_working;
-    //
-    //     // dbg!(&working);
-    //
-    //     if byte == &4 {
-    //         break;
-    //     }
-    // }
+    if index == program.len() {
+        return Some(a);
+    }
 
-    for (a, b) in iproduct!(0..1024, 0..8) {
-        let mut sim = computer.clone();
-        sim.reg_a = a;
-        sim.reg_b = b;
+    for extra_a in 0..8 {
+        let new_a = (a << 3) | extra_a;
+        let c = new_a >> (extra_a ^ 1);
 
-        let res = sim.iter_execute().collect::<Vec<_>>();
+        if b != (extra_a ^ 5 ^ c) % 8 || new_a == 0 {
+            continue;
+        }
 
-        let matches_prefix = res.iter().rev().zip(expected.iter()).all(|(&left, &right)| left == right);
-        if matches_prefix {
-            println!("{:?}", res);
-            working.insert((a, b));
+        if let Some(r) = find(program, (new_a, index + 1)) {
+            return Some(r);
         }
     }
 
-    println!("{:?}", working);
-
-    let mut sim = computer.clone();
-    // sim.reg_a = 25290733529359;
-    // sim.reg_a = 202312105601292;
-    sim.reg_a = 0b001_010_100_100_100_101_010_001_101_000_100_110_000_000_101_011;
-    println!("{:?}", sim.iter_execute().collect::<Vec<_>>());
-
-    // (0..=1_000_000).find(|i| {
-    //     let mut sim = computer.clone();
-    //     sim.reg_a = *i;
-    //
-    //     let res = sim.iter_execute().zip_longest(computer.memory.iter().copied()).all(|x| {
-    //         let (left, right) = x.left_and_right();
-    //         left == right
-    //     });
-    //
-    //     res
-    // })
-
     None
+}
+
+pub fn part_two(input: &str) -> Option<u64> {
+    let (_, computer) = Computer::parse(input).unwrap();
+
+    let program = computer.memory.iter().copied().rev().collect::<Vec<_>>();
+    find(&program, (0, 0))
 }
 
 #[cfg(test)]
@@ -270,7 +203,7 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let result = part_two(&advent_of_code::template::read_file_part("examples", DAY, 2));
-        assert_eq!(result, Some(117440));
+        let result = part_two(&advent_of_code::template::read_file("inputs", DAY));
+        assert_eq!(result, Some(202322936867370));
     }
 }
