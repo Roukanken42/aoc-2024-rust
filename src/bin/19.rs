@@ -51,8 +51,6 @@ fn is_pattern_possible(towels: &[Vec<Color>], pattern: &[Color]) -> bool {
     let mut possible = vec![false; pattern.len() + 1];
     possible[0] = true;
 
-    // println!("{:?}", pattern);
-
     for i in 0..possible.len() {
         if !possible[i] {
             continue;
@@ -63,19 +61,34 @@ fn is_pattern_possible(towels: &[Vec<Color>], pattern: &[Color]) -> bool {
                 continue 'towel;
             }
 
-            for j in 0..towel.len() {
-                if i + j >= pattern.len() || towel[j] != pattern[i + j] {
-                    continue 'towel;
-                }
+            if towel[..] == pattern[i..i + towel.len()] {
+                possible[i + towel.len()] = true;
             }
-
-            // println!("{:?} {:?}", towel, i);
-
-            possible[i + towel.len()] = true;
         }
     }
 
-    // println!("{:?}", possible);
+    possible[possible.len() - 1]
+}
+
+fn count_patterns(towels: &[Vec<Color>], pattern: &[Color]) -> u64 {
+    let mut possible = vec![0; pattern.len() + 1];
+    possible[0] = 1;
+
+    for i in 0..possible.len() {
+        if !possible[i] == 0 {
+            continue;
+        }
+
+        for towel in towels {
+            if i + towel.len() >= possible.len() {
+                continue;
+            }
+
+            if towel[..] == pattern[i..i + towel.len()] {
+                possible[i + towel.len()] += possible[i];
+            }
+        }
+    }
 
     possible[possible.len() - 1]
 }
@@ -92,8 +105,10 @@ pub fn part_one(input: &str) -> Option<usize> {
     )
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
-    None
+pub fn part_two(input: &str) -> Option<u64> {
+    let (_, input) = Input::parse(input).unwrap();
+
+    Some(input.patterns.iter().map(|pattern| count_patterns(&input.towels, pattern)).sum())
 }
 
 #[cfg(test)]
@@ -139,6 +154,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(16));
     }
 }
