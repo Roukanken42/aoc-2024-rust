@@ -47,8 +47,49 @@ impl Parsable<'_> for Input {
     }
 }
 
-pub fn part_one(input: &str) -> Option<u32> {
-    None
+fn is_pattern_possible(towels: &[Vec<Color>], pattern: &[Color]) -> bool {
+    let mut possible = vec![false; pattern.len() + 1];
+    possible[0] = true;
+
+    // println!("{:?}", pattern);
+
+    for i in 0..possible.len() {
+        if !possible[i] {
+            continue;
+        }
+
+        'towel: for towel in towels {
+            if *possible.get(i + towel.len()).unwrap_or(&true) {
+                continue 'towel;
+            }
+
+            for j in 0..towel.len() {
+                if i + j >= pattern.len() || towel[j] != pattern[i + j] {
+                    continue 'towel;
+                }
+            }
+
+            // println!("{:?} {:?}", towel, i);
+
+            possible[i + towel.len()] = true;
+        }
+    }
+
+    // println!("{:?}", possible);
+
+    possible[possible.len() - 1]
+}
+
+pub fn part_one(input: &str) -> Option<usize> {
+    let (_, input) = Input::parse(input).unwrap();
+
+    Some(
+        input
+            .patterns
+            .iter()
+            .filter(|pattern| is_pattern_possible(&input.towels, pattern))
+            .count(),
+    )
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
@@ -92,7 +133,7 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(6));
     }
 
     #[test]
