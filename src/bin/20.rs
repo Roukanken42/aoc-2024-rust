@@ -89,8 +89,59 @@ pub fn part_one_inner(input: &str, at_least: u32) -> Option<usize> {
     )
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
-    None
+pub fn part_two(input: &str) -> Option<usize> {
+    part_two_inner(input, 100)
+}
+
+pub fn part_two_inner(input: &str, at_least: u32) -> Option<usize> {
+    let (_, input) = parse(input).unwrap();
+
+    let end = input.iter_2d_keys().find(|&loc| input.get_2d(loc) == Some(&Tile::End))?;
+
+    let mut queue = VecDeque::from(vec![(end, 0)]);
+    let mut distances = vec![vec![None; input[0].len()]; input.len()];
+
+    while let Some((loc, dist)) = queue.pop_front() {
+        if distances.get_2d(loc) != Some(&None) {
+            continue;
+        }
+        distances.set_2d(loc, Some(dist));
+
+        for neigh in loc.iter_adjacent() {
+            if input.get_2d(neigh) != Some(&Tile::Wall) {
+                queue.push_back((neigh, dist + 1));
+            }
+        }
+    }
+
+    let cheats = (-20..=20)
+        .flat_map(|x: i32| (-20..=20).flat_map(move |y: i32| if x.abs() + y.abs() <= 20 { Some(Location::new(x, y)) } else { None }))
+        .collect::<Vec<Location<i32>>>();
+
+    Some(
+        distances
+            .iter_2d_keys()
+            .filter(|&loc| if let Some(&Some(_)) = distances.get_2d(loc) { true } else { false })
+            .flat_map(|start_loc| cheats.iter().map(move |cheat| (start_loc, *cheat + start_loc)))
+            .filter_map(|(start_loc, cheat)| {
+                let Some(&Some(loc_dist)) = distances.get_2d(start_loc) else {
+                    return None;
+                };
+                let Some(&Some(cheat_dist)) = distances.get_2d(cheat) else {
+                    return None;
+                };
+
+                let manhattan = start_loc.manhattan_distance(cheat) as u32;
+
+                if loc_dist <= cheat_dist + manhattan {
+                    None
+                } else {
+                    Some(loc_dist - manhattan - cheat_dist)
+                }
+            })
+            .filter(|&dist| dist >= at_least)
+            .count(),
+    )
 }
 
 #[cfg(test)]
@@ -120,7 +171,7 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        let result = part_two_inner(&advent_of_code::template::read_file("examples", DAY), 70);
+        assert_eq!(result, Some(12 + 22 + 4 + 3));
     }
 }
